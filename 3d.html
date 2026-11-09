@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>3D Rally</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+}
+canvas{
+    display:block;
+}
+</style>
+
+</head>
+<body>
+
+<script type="module">
+
+import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+
+const camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+);
+
+const renderer = new THREE.WebGLRenderer({
+antialias:true
+});
+
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
+
+document.body.appendChild(
+renderer.domElement
+);
+
+const sun = new THREE.DirectionalLight(
+0xffffff,
+2
+);
+
+sun.position.set(
+20,
+30,
+20
+);
+
+scene.add(sun);
+
+scene.add(
+new THREE.AmbientLight(
+0xffffff,
+0.5
+)
+);
+
+const ground = new THREE.Mesh(
+new THREE.PlaneGeometry(
+200,
+200
+),
+new THREE.MeshStandardMaterial({
+color:0x448844
+})
+);
+
+ground.rotation.x = -Math.PI/2;
+
+scene.add(ground)const track = new THREE.Mesh(
+  new THREE.RingGeometry(
+    25,
+    40,
+    64
+  ),
+  new THREE.MeshStandardMaterial({
+    color:0x777777,
+    side:THREE.DoubleSide
+  })
+);
+
+track.rotation.x = -Math.PI / 2;
+track.position.y = 0.05;
+
+scene.add(track);const centerGrass = new THREE.Mesh(
+  new THREE.CircleGeometry(
+    24,
+    64
+  ),
+  new THREE.MeshStandardMaterial({
+    color:0x55aa55
+  })
+);
+
+centerGrass.rotation.x = -Math.PI / 2;
+centerGrass.position.y = 0.06;
+
+scene.add(centerGrass);const startLine = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    8,
+    0.1,
+    1
+  ),
+  new THREE.MeshStandardMaterial({
+    color:0xffffff
+  })
+);
+
+startLine.position.set(
+  0,
+  0.1,
+  32
+);
+
+scene.add(startLine);;for(let i=0;i<100;i++){
+
+  const tree = new THREE.Mesh(
+    new THREE.ConeGeometry(2,6,8),
+    new THREE.MeshStandardMaterial({
+      color:0x114411
+    })
+  );
+
+  tree.position.set(
+    (Math.random()-0.5)*180,
+    3,
+    (Math.random()-0.5)*180
+  );
+
+  scene.add(tree);
+}
+
+const car = new THREE.Group();
+
+const body = new THREE.Mesh(
+new THREE.BoxGeometry(
+2,
+1,
+4
+),
+new THREE.MeshStandardMaterial({
+color:0xcc2222
+})
+);
+
+body.position.y = 1;
+
+car.add(body);
+
+scene.add(car);
+
+const keys = {};
+
+document.addEventListener(
+"keydown",
+e=>keys[e.key]=true
+);
+
+document.addEventListener(
+"keyup",
+e=>keys[e.key]=false
+);
+
+let speed = 0;
+let angle = 0;
+
+function animate(){
+
+requestAnimationFrame(
+animate
+);
+
+if(keys["w"] || keys["ArrowUp"])
+speed += 0.003;
+
+if(keys["s"] || keys["ArrowDown"])
+speed -= 0.003;
+
+speed *= 0.99;
+
+if(keys["a"] || keys["ArrowLeft"])
+angle += 0.03;
+
+if(keys["d"] || keys["ArrowRight"])
+angle -= 0.03;
+
+car.rotation.y = angle;
+
+car.position.x +=
+Math.sin(angle) * speed;
+
+car.position.z +=
+Math.cos(angle) * speed;
+
+camera.position.x =
+car.position.x -
+Math.sin(angle) * 10;
+
+camera.position.z =
+car.position.z -
+Math.cos(angle) * 10;
+
+camera.position.y = 5;
+
+camera.lookAt(car.position);
+
+renderer.render(
+scene,
+camera
+);
+
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
